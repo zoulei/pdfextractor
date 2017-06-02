@@ -1,0 +1,7 @@
+# -*- coding:gbk -*-
+
+FROMATFILE = "dist/format.xls"
+
+DOCXTEMPFILE = "dist/temp.docx"
+TEMPNAME = u"Ìî³äÄ£°å"
+COVERDIR = "·âÃæ"
