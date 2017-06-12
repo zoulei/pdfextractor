@@ -59,7 +59,17 @@ def ExtractPDF(sourcePDF, rule, outputDir):
 
     # inputPDF.close()
 
+def DeletePage():
+    inputPDF = PdfFileReader(open("E:/迅雷下载/聂怡静毕业论文20170520.pdf","rb"))
+    output = PdfFileWriter()
+    for idx in xrange(43):
+        if idx == 3:
+            continue
+        output.addPage(inputPDF.getPage(idx))
+    output.write(open("tmp.pdf","wb"))
+
 if __name__ == "__main__":
-    raw_input("why")
-    ExtractPDF("C:/Users/zoulei/PycharmProjects/pdfextractor/20151028-Opprentice (IMC)-2.pdf",extractRule.ExtractFromTxt("C:/Users/zoulei/PycharmProjects/pdfextractor/123.txt"),"C:/Users/zoulei/PycharmProjects/pdfextractor/output")
-    raw_input("press any key to exit")
+    # raw_input("why")
+    # ExtractPDF("C:/Users/zoulei/PycharmProjects/pdfextractor/20151028-Opprentice (IMC)-2.pdf",extractRule.ExtractFromTxt("C:/Users/zoulei/PycharmProjects/pdfextractor/123.txt"),"C:/Users/zoulei/PycharmProjects/pdfextractor/output")
+    # raw_input("press any key to exit")
+    DeletePage()

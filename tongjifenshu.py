@@ -143,7 +143,8 @@ def WriteScoreXls(excelFname,scorelist):
     print offsetlist
     for idx,singleclassscore in enumerate(scorelist):
         for key ,value in singleclassscore.items():
-            modifyExcelFile.get_sheet(idx).write(key,12,value-offsetlist[idx])
+            # modifyExcelFile.get_sheet(idx).write(key,12,value-offsetlist[idx])
+            modifyExcelFile.get_sheet(idx).write(key,12,int(value))
 
     del excelFile
 
