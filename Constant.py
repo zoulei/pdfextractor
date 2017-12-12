@@ -3,5 +3,6 @@
 FROMATFILE = "dist/format.xls"
 
 DOCXTEMPFILE = "dist/temp.docx"
+DOCXTEMPFILE1 = "dist/temp1.docx"
 TEMPNAME = u"Ìî³äÄ£°å"
 COVERDIR = "·âÃæ"

@@ -2,7 +2,7 @@
 from distutils.core import setup
 import common
 import py2exe
-setup(console=["autoSplit.py","deleteABCD.py","mercolumn.py","gencover.py","checksplitresult.py","packfile.py"])
+setup(console=["autoSplit.py","deleteABCD.py","mercolumn.py","gencover.py","checksplitresult.py","packfile.py","newgencover.py"])
 
 # common.RenameFile("dist/autoSplit.exe","dist/自动提取pdf.exe")
 # common.RenameFile("dist/deleteABCD.exe","dist/删除ABCD.exe")
