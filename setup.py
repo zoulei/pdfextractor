@@ -2,6 +2,9 @@
 from distutils.core import setup
 import common
 import py2exe
+
+# how to use :
+# under cmd : python setup.py py2exe
 setup(console=["autoSplit.py","deleteABCD.py","mercolumn.py","gencover.py","checksplitresult.py","packfile.py","newgencover.py","autofillxlsfile.py"])
 
 # common.RenameFile("dist/autoSplit.exe","dist/自动提取pdf.exe")
