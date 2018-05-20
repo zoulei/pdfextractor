@@ -1,9 +1,8 @@
 # -*- coding: gbk -*-
 
-from openpyxl import load_workbook
+# from openpyxl import load_workbook
 from xlutils.filter import process,XLRDReader, XLWTWriter
 import xlrd
-import xlutils.copy
 import configuration
 import error
 import common
@@ -15,36 +14,36 @@ def ModifyExcel(fname):
     if (fname.endswith(".xls")):
         return ModifyXls(fname)
     elif (fname.endswith(".xlsx")):
-        return ModifyXlsx(fname)
+        info.DisplayInfo("程序不支持xlsx文件，请联系开发人员")
     else:
         error.NotExcelFile()
         exit()
         return None
 
-def ModifyXlsx(excelFName):
-    excelFile = load_workbook(excelFName,read_only=False)
-    sheetsName = excelFile.get_sheet_names()
-    sheetsName = [str(v) for v in sheetsName]
-
-    for sheetName in sheetsName:
-        itemNum = 1
-        sheet = excelFile.get_sheet_by_name(sheetName)
-        for idx, row in enumerate(sheet.rows):
-            if idx < configuration.STARTROW - 1:
-                continue
-            if row[3].value == None:
-                continue
-            pos = "%s%d"%(configuration.GetChar(configuration.PAGECOL),idx + 1)
-            saveStyle = row[3].style
-            sheet[pos] = common.GeneraterPageNumber(str(sheet[pos].value))
-            sheet[pos].style = saveStyle
-            itemNum += 1
-
-    try:
-        excelFile.save(excelFName)
-    except:
-        error.CanNotWrite(excelFName)
-        common.ExitDueToError()
+# def ModifyXlsx(excelFName):
+#     excelFile = load_workbook(excelFName,read_only=False)
+#     sheetsName = excelFile.get_sheet_names()
+#     sheetsName = [str(v) for v in sheetsName]
+#
+#     for sheetName in sheetsName:
+#         itemNum = 1
+#         sheet = excelFile.get_sheet_by_name(sheetName)
+#         for idx, row in enumerate(sheet.rows):
+#             if idx < configuration.STARTROW - 1:
+#                 continue
+#             if row[3].value == None:
+#                 continue
+#             pos = "%s%d"%(configuration.GetChar(configuration.PAGECOL),idx + 1)
+#             saveStyle = row[3].style
+#             sheet[pos] = common.GeneraterPageNumber(str(sheet[pos].value))
+#             sheet[pos].style = saveStyle
+#             itemNum += 1
+#
+#     try:
+#         excelFile.save(excelFName)
+#     except:
+#         error.CanNotWrite(excelFName)
+#         common.ExitDueToError()
 
 def copy2(wb):
     w = XLWTWriter()

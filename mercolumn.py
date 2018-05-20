@@ -1,7 +1,7 @@
 # -*- coding:gbk -*-
 #!/usr/bin/env python -u
 
-from openpyxl import load_workbook
+# from openpyxl import load_workbook
 from xlutils.filter import process,XLRDReader, XLWTWriter
 import xlrd
 import xlutils.copy
@@ -25,29 +25,29 @@ def ModifyExcel(fname):
         common.ExitDueToError()
         return None
 
-def ModifyXlsx(excelFName):
-    excelFile = load_workbook(excelFName,read_only=False)
-    sheetsName = excelFile.get_sheet_names()
-    sheetsName = [str(v) for v in sheetsName]
-
-    for sheetName in sheetsName:
-        itemNum = 1
-        sheet = excelFile.get_sheet_by_name(sheetName)
-        for idx, row in enumerate(sheet.rows):
-            if idx < configuration.STARTROW - 1:
-                continue
-            if row[3].value == None:
-                continue
-            pos = "%s%d"%(configuration.GetChar(configuration.ORDERCOL),idx + 1)
-            sheet[pos] = itemNum
-            sheet[pos].style = row[3].style
-            itemNum += 1
-
-    try:
-        excelFile.save(excelFName)
-    except:
-        error.CanNotWrite(excelFName)
-        common.ExitDueToError()
+# def ModifyXlsx(excelFName):
+#     excelFile = load_workbook(excelFName,read_only=False)
+#     sheetsName = excelFile.get_sheet_names()
+#     sheetsName = [str(v) for v in sheetsName]
+#
+#     for sheetName in sheetsName:
+#         itemNum = 1
+#         sheet = excelFile.get_sheet_by_name(sheetName)
+#         for idx, row in enumerate(sheet.rows):
+#             if idx < configuration.STARTROW - 1:
+#                 continue
+#             if row[3].value == None:
+#                 continue
+#             pos = "%s%d"%(configuration.GetChar(configuration.ORDERCOL),idx + 1)
+#             sheet[pos] = itemNum
+#             sheet[pos].style = row[3].style
+#             itemNum += 1
+#
+#     try:
+#         excelFile.save(excelFName)
+#     except:
+#         error.CanNotWrite(excelFName)
+#         common.ExitDueToError()
 
 def copy2(wb):
     w = XLWTWriter()

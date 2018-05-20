@@ -1,5 +1,5 @@
 # -*- coding: gbk -*-
-from openpyxl import load_workbook
+# from openpyxl import load_workbook
 import xlrd
 import common
 import error
@@ -24,30 +24,30 @@ def ReadPage(pageStr):
 
     return result
 
-def ExtractXlsx(fname,configData):
-    splitDict = {}
-
-    excelFile = load_workbook(fname)
-    sheetsName = excelFile.get_sheet_names()
-    sheetsName = [str(v) for v in sheetsName]
-    for sheetName in sheetsName:
-        splitDict[sheetName] = {}
-        subDict = splitDict[sheetName]
-        sheet = excelFile.get_sheet_by_name(sheetName)
-        for idx, row in enumerate(sheet.rows):
-            if idx <= 3:
-                continue
-            if row[0].value == None:
-                continue
-            try:
-                subDict[int(row[0].value)] = ReadPage(row[3].value)
-            except:
-                error.ExcelMiddleItemError(sheetName,idx + 1)
-                # print "在excel表单%s中，第%d行发生了问题，请查看." % (sheetName, idx + 1)
-
-    calSplitDict(splitDict, * configData)
-
-    return splitDict
+# def ExtractXlsx(fname,configData):
+#     splitDict = {}
+#
+#     excelFile = load_workbook(fname)
+#     sheetsName = excelFile.get_sheet_names()
+#     sheetsName = [str(v) for v in sheetsName]
+#     for sheetName in sheetsName:
+#         splitDict[sheetName] = {}
+#         subDict = splitDict[sheetName]
+#         sheet = excelFile.get_sheet_by_name(sheetName)
+#         for idx, row in enumerate(sheet.rows):
+#             if idx <= 3:
+#                 continue
+#             if row[0].value == None:
+#                 continue
+#             try:
+#                 subDict[int(row[0].value)] = ReadPage(row[3].value)
+#             except:
+#                 error.ExcelMiddleItemError(sheetName,idx + 1)
+#                 # print "在excel表单%s中，第%d行发生了问题，请查看." % (sheetName, idx + 1)
+#
+#     calSplitDict(splitDict, * configData)
+#
+#     return splitDict
 
 def ExtractXls(fname,configData):
     splitDict = {}
@@ -80,7 +80,8 @@ def ExtractExcel(fname,configData):
     if (fname.endswith(".xls")):
         return ExtractXls(fname,configData)
     elif (fname.endswith(".xlsx")):
-        return ExtractXlsx(fname,configData)
+        # return ExtractXlsx(fname,configData)
+        info.DisplayInfo("程序不支持xlsx文件，请联系开发人员")
     else:
         error.NotExcelFile()
         common.ExitDueToError()

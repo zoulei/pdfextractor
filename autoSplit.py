@@ -15,8 +15,6 @@ import traceback
 import info
 import extractRule_1
 
-from openpyxl import load_workbook
-import xlrd
 
 def autoSplit(excelFName,configData,pdfDir = None):
     excelFName = common.Path(excelFName)
