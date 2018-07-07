@@ -31,10 +31,28 @@ def copy2(wb):
 def ModifyXls(excelFname,outputexcelFname):
     excelFile = xlrd.open_workbook(excelFname,formatting_info=True)
     sheetsName = excelFile.sheet_names()
-    sheetsName = [str(v) for v in sheetsName]
+    # sheetsName = [str(v) for v in sheetsName]
 
-    sheetsName = zip(range(len(sheetsName)),sheetsName)
-    sheetsName.sort(key=lambda v:int(v[1]))
+    # sheetsName = zip(range(len(sheetsName)),sheetsName)
+    # sheetsName.sort(key=lambda v:int(v[1]))
+    realsheetsname = []
+    for sheetname in sheetsName:
+        try:
+            sheet = excelFile.sheet_by_name(sheetname)
+            dananhao = sheet.cell_value(1, 0)
+            shunxuidx = dananhao.find(u"－")
+            if shunxuidx == -1:
+                shunxuidx = dananhao.find("-")
+            bianhao = int(dananhao[shunxuidx + 1:].strip())
+            realsheetsname.append([bianhao, sheetname])
+        except Exception as e:
+            info.DisplayInfo("错误发生表单，错误表单名字如下："  )
+            info.DisplayInfo(sheetname)
+            traceback.print_exc()
+            raise e
+    realsheetsname.sort(key=lambda v:v[0])
+    sheetsName = realsheetsname
+
     sheetsName = sheetsName[1:] + [sheetsName[0],]
 
     outputexcelFile = xlrd.open_workbook(outputexcelFname,formatting_info=True)
@@ -79,14 +97,17 @@ def ModifyXls(excelFname,outputexcelFname):
                     pass
             zhangci = sheet.cell_value(rowidx - 1,3).strip()
             zhangciidx = zhangci.find("-")
+            if zhangciidx == -1:
+                zhangciidx = zhangci.find(u"－")
             zhangci = zhangci[zhangciidx+1:]
 
-            modifyExcelFile.get_sheet(0).write(idx+4, 0, str(idx+1),stylenumber)
-            modifyExcelFile.get_sheet(0).write(idx+4, 1, dananhao,styledanganhao)
-            modifyExcelFile.get_sheet(0).write(idx+4, 2, str1+"\n"+str2,stylecontent)
-            modifyExcelFile.get_sheet(0).write(idx+4, 6, zhangci,stylezhangci)
+            modifyExcelFile.get_sheet(0).write(idx+3, 0, str(idx),stylenumber)
+            modifyExcelFile.get_sheet(0).write(idx+3, 1, dananhao,styledanganhao)
+            modifyExcelFile.get_sheet(0).write(idx+3, 2, str1+"\n"+str2,stylecontent)
+            modifyExcelFile.get_sheet(0).write(idx+3, 6, zhangci,stylezhangci)
         except Exception as e:
-            info.DisplayInfo( "错误发生表单：" + sheetName)
+            info.DisplayInfo("错误发生表单，错误表单名字如下：")
+            info.DisplayInfo(sheetName)
             traceback.print_exc()
             raise e
 
