@@ -168,14 +168,19 @@ def correctpdfdirection(sourcedir):
         if not os.path.exists(curdirname):
             os.makedirs(curdirname)
 
-    info.DisplayInfo("开始转换文件，处理结果存储在如下路径中：\n" + rotatedir.encode("gbk"))
+    # info.DisplayInfo("开始转换文件，处理结果存储在如下路径中：\n" + rotatedir.encode("gbk"))
+    info.DisplayInfo("开始转换文件，处理结果存储在如下路径中：\n" + rotatedir)
     for idx,v in enumerate(allfname):
         foundfalse = pdfdirection(sourcedir+"/"+v,rotatedir+"/"+v)
         if foundfalse:
-            info.DisplayInfo("完成文件" + (rotatedir + "/" + v).encode("gbk") + "，本文档中存在一些无法识别的页面，需要人工处理，相关信息存储在‘错误.txt’文件中")
+            # info.DisplayInfo("完成文件" + (rotatedir + "/" + v).encode("gbk") + "，本文档中存在一些无法识别的页面，需要人工处理，相关信息存储在‘错误.txt’文件中")
+            info.DisplayInfo("完成文件" + (rotatedir + "/" + v) + "，本文档中存在一些无法识别的页面，需要人工处理，相关信息存储在‘错误.txt’文件中")
         else:
-            info.DisplayInfo("完成文件" + (rotatedir+"/"+v).encode("gbk") + "")
-        info.DisplayInfo("已完成第 " + str(idx+rotatelen + 1).encode("gbk") + " 个pdf文件，共 " + str(originlen).encode("gbk") + " 个pdf文件")
+            # info.DisplayInfo("完成文件" + (rotatedir+"/"+v).encode("gbk") + "")
+            info.DisplayInfo("完成文件" + (rotatedir + "/" + v) + "")
+        # info.DisplayInfo("已完成第 " + str(idx+rotatelen + 1).encode("gbk") + " 个pdf文件，共 " + str(originlen).encode("gbk") + " 个pdf文件")
+        info.DisplayInfo(
+            "已完成第 " + str(idx + rotatelen + 1) + " 个pdf文件，共 " + str(originlen) + " 个pdf文件")
 
     info.DisplayInfo("全部完成")
     return rotatedir
@@ -186,7 +191,8 @@ def correctpdfmain():
     # excelFName = "C:/Users/34695/Desktop/testdir1"
 
     rotatedir = correctpdfdirection(excelFName)
-    info.DisplayInfo("处理完毕,结果存储在如下路径中：\n"+ rotatedir.encode("gbk"))
+    # info.DisplayInfo("处理完毕,结果存储在如下路径中：\n"+ rotatedir.encode("gbk"))
+    info.DisplayInfo("处理完毕,结果存储在如下路径中：\n" + rotatedir)
     error.Finish()
 
 # def testfunc(arg):

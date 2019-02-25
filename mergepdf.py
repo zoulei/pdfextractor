@@ -66,7 +66,7 @@ def mergepdfmain():
     # excelFName = "C:/Users/34695/Desktop/testdir1"
 
     rotatedir = mergepdf(excelFName)
-    info.DisplayInfo("处理完毕,结果存储在如下路径中：\n" + rotatedir.encode("gbk"))
+    info.DisplayInfo("处理完毕,结果存储在如下路径中：\n" + rotatedir)
     error.RealFinish()
 
 if __name__ == "__main__":
