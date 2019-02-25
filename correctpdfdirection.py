@@ -149,12 +149,14 @@ def correctpdfdirection(sourcedir):
     sourcedirlen = len(sourcedir)
     allfname = pathOperator.listallfiler(sourcedir)
     allfname = [v[sourcedirlen:] for v in allfname]
+    allfname = [v for v in allfname if v.endswith(".pdf")]
     originlen = len(allfname)
     rotatedir = sourcedir + "_rotate"
     rotatedir = os.path.abspath(rotatedir)
     allrotatedfname = pathOperator.listallfiler(rotatedir)
     rotatedirlen = len(rotatedir)
     allrotatedfname = [v[rotatedirlen:] for v in allrotatedfname]
+    allrotatedfname = [v for v in allrotatedfname if v.endswith(".pdf")]
     rotatelen = len(allrotatedfname)
     for v in allrotatedfname:
         if v in allfname:
