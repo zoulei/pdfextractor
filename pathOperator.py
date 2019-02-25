@@ -8,6 +8,9 @@ def listall(path):
 
 # list all file under path dir recursively
 def listallfiler(path):
+    path = os.path.abspath(path)
+    if not os.path.exists(path):
+        return []
     allFileList = []
 
     dirstack = [path]

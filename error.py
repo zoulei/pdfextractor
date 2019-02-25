@@ -10,10 +10,13 @@ class ErrorLog:
         self.m_Info = 0
         self.m_Len = 0
 
+        self.m_file = open(self.m_fname, "w")
+
     def add(self, log):
         if not self.m_file:
             self.m_file = open(self.m_fname, "w")
         self.m_file.write(log + "\n")
+        self.m_file.flush()
 
     def close(self):
         if self.m_file:
@@ -147,6 +150,10 @@ def CheckSplitResultError(dirname):
 
 def PageNotMatch(fname):
     log = "文件：%s 不匹配" % fname
+    AddErrorLog(log)
+
+def RotateError(fname, pagenum):
+    log = "文件 %s 的第 %d 页可能识别有误，请人工检查该页的识别结果并调整" % (fname, pagenum)
     AddErrorLog(log)
 
 def AddInfo(info):

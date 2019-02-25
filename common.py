@@ -76,6 +76,8 @@ def ProDir(func,dirName):
     for fname in fileList:
         func(fname)
 
+
+
 if __name__ == "__main__":
     print GeneraterPageNumber("081-082")
     print GeneraterPageNumber("081-082A")

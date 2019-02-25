@@ -1,0 +1,2 @@
+correctpdfdirection.exe
+PAUSE
