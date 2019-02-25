@@ -17,7 +17,7 @@ import py2exe
 
 # how to use :
 # under cmd : python setup.py py2exe
-setup(console=["autoSplit.py","deleteABCD.py","mercolumn.py","gencover.py","checksplitresult.py","packfile.py","newgencover.py","autofillxlsfile.py","correctpdfdirection.py"])
+setup(console=["autoSplit.py","deleteABCD.py","mercolumn.py","gencover.py","checksplitresult.py","packfile.py","newgencover.py","autofillxlsfile.py","correctpdfdirection.py","mergepdf.py"])
 
 # common.RenameFile("dist/autoSplit.exe","dist/自动提取pdf.exe")
 # common.RenameFile("dist/deleteABCD.exe","dist/删除ABCD.exe")

@@ -58,6 +58,10 @@ def AddInfoLog(log):
 
     errorLog.addInfo(log)
 
+def RealFinish():
+    global errorLog
+    info.DisplayInfo("×ª»»Íê±Ï¡£")
+
 def Finish():
     global errorLog
 
