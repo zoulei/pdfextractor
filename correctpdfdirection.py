@@ -14,6 +14,8 @@ import sys
 import numpy as np
 import traceback
 import time
+import Constant
+import threading
 
 Image.MAX_IMAGE_PIXELS = None
 
@@ -82,15 +84,17 @@ def modifyimage(img):
 
 def ocrpage(arg):
     fname,idx = arg
-    dpilist = [(100,0),(100,1), (200,0),(200,1)]
+    dpilist = [100,]
+    # dpilist = [(100,0),(100,1), (200,0),(200,1)]
     # dpilist = [(100, 0), (100, 1), (200, 0), (200, 1), (500, 0), (500, 1), (750, 0), (750, 1), (1000, 0), (1000, 1)]
-    for dpi, cimg in dpilist:
+    for dpi in dpilist:
+    # for dpi, cimg in dpilist:
         try:
             images = convert_from_path(fname, dpi=dpi, first_page=idx + 1, last_page=idx + 1)
-            if cimg == 1:
-                images[0] = modifyimage(images[0])
-            else:
-                images[0] = modifybluecover(images[0])
+            # if cimg == 1:
+            #     images[0] = modifyimage(images[0])
+            # else:
+            #     images[0] = modifybluecover(images[0])
             osdresult = pytesseract.image_to_osd(images[0], lang="chi_sim", output_type=pytesseract.Output.DICT)
             # print idx+1, (osdresult["orientation_conf"], osdresult["rotate"], dpi, cimg)
             if osdresult["orientation_conf"] < 1:
@@ -108,44 +112,50 @@ def ocrpage(arg):
         # print idx + 1, (-1, 0, -1)
         return (-1, 0, -1)
 
-def pdfdirection(fname, ofname):
+def pdfdirection(args):
+    fname, ofname = args
     pdf_in = open(fname, 'rb')
     pdf_reader = PyPDF2.PdfFileReader(pdf_in)
-    pdf_writer = PyPDF2.PdfFileWriter()
-    start = time.time()
-    pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
-    # ocrresult = [ocrpage((fname, 0)),]
-    # return
-    ocrresult = pool.map(ocrpage,[(fname, v) for v in xrange(pdf_reader.numPages)])
-    # ocrresult = pool.map(ocrpage, [(fname, v) for v in xrange(1,2)])
-    # print "multiprocess:", time.time() - start
-    start = time.time()
-    pool.close()
-    foundfalse = False
-    for idx in xrange(len(ocrresult)):
-        page = pdf_reader.getPage(idx)
-        conf, rotate, dpi = ocrresult[idx]
-        if conf == -1:
-            foundfalse = True
-            error.RotateError(ofname,idx+1)
-        if rotate != 0:
-            page.rotateClockwise(rotate)
-        pdf_writer.addPage(page)
+    result = [[],[]]
+    rotateresult = [-1,-1]
+    found = [False,False]
+    for idx in xrange(pdf_reader.numPages):
+        sdidx = idx % 2
+        if sdidx == 1:
+            continue
+        if found[sdidx]:
+            continue
+        conf,rotate,dpi = ocrpage([fname, idx])
+        if dpi == -1:
+            continue
+        subresult = result[sdidx]
+        if rotate not in subresult:
+            subresult.append(rotate)
+        else:
+            found[sdidx] = True
+            rotateresult[sdidx] = rotate
+            break
+            if found[0] and found[1]:
+                break
 
-    pdf_out = open(ofname, 'wb')
-    pdf_writer.write(pdf_out)
-    pdf_out.close()
-    pdf_in.close()
-    # print "write:", time.time() - start
-    return foundfalse
+    for idx in xrange(len(rotateresult)):
+        if rotateresult[idx] != -1:
+            continue
+        if len(result[idx]) == 0:
+            continue
+        rotateresult[idx] = result[idx][0]
+    basename = os.path.basename(fname)
+    dotpos = basename.find(".")
+    writefname = basename[:dotpos] + Constant.CORRECTPDFDIRECTIONPOSTFIX
+    ofile = open(writefname, "w")
+    ofile.write(" ".join([fname, ofname, str(rotateresult[0]), str(rotateresult[1])]) + "\n")
+    ofile.close()
+    return
 
-def correctpdfdirection(sourcedir):
+
+def getallfname(sourcedir):
     sourcedir = common.Path(sourcedir)
-    os.environ["PATH"] += ";"+os.getcwd()+"/dist/poppler-0.68.0/bin"
-    os.environ["PATH"] += ";"+os.getcwd()+"/dist/Tesseract-OCR"
-    info.DisplayInfo("检测文件")
     sourcedir = os.path.abspath(sourcedir)
-    info.DisplayInfo(sourcedir)
     sourcedirlen = len(sourcedir)
     allfname = pathOperator.listallfiler(sourcedir)
     allfname = [v[sourcedirlen:] for v in allfname]
@@ -161,6 +171,51 @@ def correctpdfdirection(sourcedir):
     for v in allrotatedfname:
         if v in allfname:
             allfname.remove(v)
+    return allfname
+
+def dothecorrectwork(sourcedir):
+    while True:
+        if len(getallfname(sourcedir)) == 0:
+            break
+        allfname = pathOperator.listallfiler("./")
+        allfname = [v for v in allfname if v.endswith(Constant.CORRECTPDFDIRECTIONPOSTFIX)]
+        for fname in allfname:
+            ifile = open(fname)
+            line = ifile.readline().strip()
+            ifile.close()
+            data = line.split(" ")
+            sourcefname,ofname,singlerotate,doublerotate = data
+            singlerotate = int(singlerotate)
+            doublerotate = int(doublerotate)
+            if singlerotate == -1:
+                singlerotate = 0
+                error.RotateError(fname)
+                return
+            if doublerotate == -1:
+                doublerotate = singlerotate
+            pdf_in = open(sourcefname, 'rb')
+            pdf_reader = PyPDF2.PdfFileReader(pdf_in)
+            pdf_writer = PyPDF2.PdfFileWriter()
+            for idx in xrange(pdf_reader.numPages):
+                page = pdf_reader.getPage(idx)
+                if (idx + 1) % 2 == 0:
+                    page.rotateClockwise(singlerotate)
+                else:
+                    page.rotateClockwise(doublerotate)
+                pdf_writer.addPage(page)
+            pdf_out = open(ofname, 'wb')
+            pdf_writer.write(pdf_out)
+            pdf_out.close()
+            pdf_in.close()
+            os.remove(fname)
+
+def correctpdfdirection(sourcedir):
+    sourcedir = common.Path(sourcedir)
+    info.DisplayInfo("检测文件")
+    allfname = getallfname(sourcedir)
+
+    rotatedir = sourcedir + "_rotate"
+    rotatedir = os.path.abspath(rotatedir)
 
     for v in allfname:
         curfname = rotatedir + v
@@ -168,42 +223,47 @@ def correctpdfdirection(sourcedir):
         if not os.path.exists(curdirname):
             os.makedirs(curdirname)
 
-    # info.DisplayInfo("开始转换文件，处理结果存储在如下路径中：\n" + rotatedir.encode("gbk"))
     info.DisplayInfo("开始转换文件，处理结果存储在如下路径中：\n" + rotatedir)
-    for idx,v in enumerate(allfname):
-        foundfalse = pdfdirection(sourcedir+"/"+v,rotatedir+"/"+v)
-        if foundfalse:
-            # info.DisplayInfo("完成文件" + (rotatedir + "/" + v).encode("gbk") + "，本文档中存在一些无法识别的页面，需要人工处理，相关信息存储在‘错误.txt’文件中")
-            info.DisplayInfo("完成文件" + (rotatedir + "/" + v) + "，本文档中存在一些无法识别的页面，需要人工处理，相关信息存储在‘错误.txt’文件中")
-        else:
-            # info.DisplayInfo("完成文件" + (rotatedir+"/"+v).encode("gbk") + "")
-            info.DisplayInfo("完成文件" + (rotatedir + "/" + v) + "")
-        # info.DisplayInfo("已完成第 " + str(idx+rotatelen + 1).encode("gbk") + " 个pdf文件，共 " + str(originlen).encode("gbk") + " 个pdf文件")
-        info.DisplayInfo(
-            "已完成第 " + str(idx + rotatelen + 1) + " 个pdf文件，共 " + str(originlen) + " 个pdf文件")
+    pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
+    start = time.time()
+    ocrresult = pool.map(pdfdirection,[(sourcedir + v, rotatedir + v) for v in allfname])
+    # print "dsfsdf:",time.time() - start
+
+    # for idx,v in enumerate(allfname):
+    #     foundfalse = pdfdirection(sourcedir+"/"+v,rotatedir+"/"+v)
+    #     if foundfalse:
+    #         # info.DisplayInfo("完成文件" + (rotatedir + "/" + v).encode("gbk") + "，本文档中存在一些无法识别的页面，需要人工处理，相关信息存储在‘错误.txt’文件中")
+    #         info.DisplayInfo("完成文件" + (rotatedir + "/" + v) + "，本文档中存在一些无法识别的页面，需要人工处理，相关信息存储在‘错误.txt’文件中")
+    #     else:
+    #         # info.DisplayInfo("完成文件" + (rotatedir+"/"+v).encode("gbk") + "")
+    #         info.DisplayInfo("完成文件" + (rotatedir + "/" + v) + "")
+    #     # info.DisplayInfo("已完成第 " + str(idx+rotatelen + 1).encode("gbk") + " 个pdf文件，共 " + str(originlen).encode("gbk") + " 个pdf文件")
+    #     info.DisplayInfo(
+    #         "已完成第 " + str(idx + rotatelen + 1) + " 个pdf文件，共 " + str(originlen) + " 个pdf文件")
 
     info.DisplayInfo("全部完成")
     return rotatedir
 
 def correctpdfmain():
     error.CreateLog("错误.txt")
+    os.environ["PATH"] += ";" + os.getcwd() + "/dist/poppler-0.68.0/bin"
+    os.environ["PATH"] += ";" + os.getcwd() + "/dist/Tesseract-OCR"
     excelFName = sys.argv[1]
-    # excelFName = "C:/Users/34695/Desktop/testdir1"
-
+    # excelFName = "C:/Users/34695/Desktop/testdir"
+    t1 = threading.Thread(target=dothecorrectwork, name='t1', args=(excelFName, ))
+    t1.start()
     rotatedir = correctpdfdirection(excelFName)
     # info.DisplayInfo("处理完毕,结果存储在如下路径中：\n"+ rotatedir.encode("gbk"))
     info.DisplayInfo("处理完毕,结果存储在如下路径中：\n" + rotatedir)
-    error.Finish()
+    t1.join()
+    error.RealFinish()
 
-# def testfunc(arg):
-#     print arg
+def testfunc(arg):
+    print arg
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
-    # pool = multiprocessing.Pool(processes=3)
-    # pool.map(testfunc,range(2))
     common.SafeRunProgram(correctpdfmain)
 
 # print 123
 # time.sleep(15)
-# pdfdirection("C:\Users/34695\Desktop/02.pdf","C:\Users/34695\Desktop/02ggg.pdf")

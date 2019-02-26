@@ -70,6 +70,5 @@ def DeletePage():
 
 if __name__ == "__main__":
     # raw_input("why")
-    # ExtractPDF("C:/Users/zoulei/PycharmProjects/pdfextractor/20151028-Opprentice (IMC)-2.pdf",extractRule.ExtractFromTxt("C:/Users/zoulei/PycharmProjects/pdfextractor/123.txt"),"C:/Users/zoulei/PycharmProjects/pdfextractor/output")
     # raw_input("press any key to exit")
     DeletePage()
