@@ -48,7 +48,7 @@ def RenameFile(sourceName, targetName):
 def ExitDueToError():
     traceback.print_exc()
     # raw_input()
-    print "程序发生错误，请保存错误提示并联系开发人员"
+    print "程序发生错误，请联系开发人员"
     try:
         sys.exit()
     except SystemExit:
