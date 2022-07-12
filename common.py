@@ -76,7 +76,10 @@ def ProDir(func,dirName):
     for fname in fileList:
         func(fname)
 
-
+def CorrectFName(fname):
+    for v in "\\/:*?\"<>|":
+        fname = fname.replace(v, "")
+    return fname
 
 if __name__ == "__main__":
     print GeneraterPageNumber("081-082")

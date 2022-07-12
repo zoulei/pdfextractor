@@ -48,13 +48,20 @@ def Split(all_page_config, pdf_dir, output_dir):
         os.mkdir(sheet_dir)
 
         for i in range(len(page_config) - 1):
-            write_fname = os.path.join(sheet_dir, page_config[i][0].encode("gbk") + ".pdf")
+            write_fname = page_config[i][0].encode("gbk") + ".pdf"
+            new_write_fname = common.CorrectFName(write_fname)
+            if new_write_fname != write_fname:
+                info.DisplayInfo("文件名有问题：" + write_fname)
+            new_write_fname = os.path.join(sheet_dir, new_write_fname)
+            # write_fname = os.path.join(sheet_dir, page_config[i][0].encode("gbk") + ".pdf")
+            # print page_config[i][0].encode("gbk") + ".pdf"
+            # new_write_fname = common.CorrectFName(write_fname)
             start_page = page_config[i][1]
             end_page = page_config[i + 1][1]
             output = PdfFileWriter()
             for j in range(start_page, end_page):
                 output.addPage(inputPDF.getPage(j - 1))
-            output.write(open(write_fname, "wb"))
+            output.write(open(new_write_fname, "wb"))
     return 0
 
 def ReadSplitConfig(excelFName):
@@ -80,6 +87,8 @@ def ReadSplitConfig(excelFName):
             if not page:
                 info.DisplayInfo(sheet_name + " 页处理失败，页码填错，行号：" + str(row))
                 return 1
+            # print "page:", page
+            page = str(page)
             page = "".join(page.split())
             page = page.replace(u"—", "-")
             if "-" in page:
