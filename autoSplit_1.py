@@ -29,6 +29,7 @@ def Split(all_page_config, pdf_dir, output_dir):
         info.DisplayInfo("目录不存在！路径：" + output_dir)
         return 1
     for sheet_name, page_config in all_page_config.items():
+        info.DisplayInfo("开始处理页:" + sheet_name)
         # print type(pdf_dir), type(sheet_name)
         pdfPath = os.path.join(pdf_dir, sheet_name+".pdf")
         if (not os.path.exists(pdfPath)):
@@ -48,7 +49,7 @@ def Split(all_page_config, pdf_dir, output_dir):
         os.mkdir(sheet_dir)
 
         for i in range(len(page_config) - 1):
-            write_fname = page_config[i][0].encode("gbk") + ".pdf"
+            write_fname = page_config[i][0] + ".pdf"
             new_write_fname = common.CorrectFName(write_fname)
             if new_write_fname != write_fname:
                 info.DisplayInfo("文件名有问题：" + write_fname)
@@ -79,7 +80,7 @@ def ReadSplitConfig(excelFName):
         sheet_config = page_config[sheet_name]
         row = 3
         while True:
-            out_fname = sheet[row][3].value
+            out_fname = str(sheet[row][0].value) + "." + str(sheet[row][3].value.encode("gbk"))
             if not out_fname:
                 info.DisplayInfo(sheet_name + " 页处理失败，没有填文件题名，行号：" + str(row))
                 return 1
