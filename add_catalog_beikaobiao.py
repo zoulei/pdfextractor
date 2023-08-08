@@ -12,12 +12,15 @@ import openpyxl
 from pyPdf import PdfFileWriter, PdfFileReader
 from win32com import client
 
-def Split(excelFName, beikaobiao_fname, pdf_dir, output_dir):
+def Split(excelFName, beikaobiao_fname, pdf_dir, output_dir, appName):
     pdf_dir = common.Path(pdf_dir)
     output_dir = common.Path(output_dir)
     excelFName = common.Path(excelFName)
     beikaobiao_fname = common.Path(beikaobiao_fname)
-    excel = client.Dispatch("Excel.Application")
+    excel = client.Dispatch(appName)
+    # excel = client.Dispatch("Excel.Application")
+    # excel = client.gencache.EnsureDispatch("et.Application")
+    # print "excel : ", excel
     sheets = excel.Workbooks.Open(excelFName)
 
     beikaobiao_wb = excel.Workbooks.Open(beikaobiao_fname)
@@ -79,8 +82,10 @@ def AutoSplitMain():
     info.DisplayInfo("pdf dir : " + pdfDir)
     outputDir = sys.argv[4]
     info.DisplayInfo("output dir : " + outputDir)
+    appName = sys.argv[5]
+    info.DisplayInfo("appName : " + appName)
 
-    if Split(excelFName, beikaobiaoFName, pdfDir, outputDir, ) == 0:
+    if Split(excelFName, beikaobiaoFName, pdfDir, outputDir, appName) == 0:
         info.DisplayInfo("处理完成")
         return
 

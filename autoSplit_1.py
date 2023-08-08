@@ -16,7 +16,7 @@ import info
 # import extractRule_1
 
 import openpyxl
-from pyPdf import PdfFileWriter, PdfFileReader
+from PyPDF2 import PdfFileWriter, PdfFileReader
 import shutil
 
 def Split(all_page_config, pdf_dir, output_dir):
@@ -40,7 +40,7 @@ def Split(all_page_config, pdf_dir, output_dir):
         # import pprint
         # pprint.pprint(page_config)
         if num_pages != page_config[-1][1] - 1:
-            info.DisplayInfo(pdfPath + " 的页数为 " + str(num_pages) + ", excel中填的页数为 " + str(page_config[-1][1]))
+            info.DisplayInfo(pdfPath + " 的页数为 " + str(num_pages) + ", excel中填的页数为 " + str(page_config[-1][1] - 1))
             return 1
         sheet_dir = os.path.join(output_dir, sheet_name)
 
