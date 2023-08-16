@@ -38,6 +38,11 @@ def Split(excelFName, beikaobiao_fname, pdf_dir, output_dir, appName):
     beikaobiao_page_num = beikaobiao_pdf.getNumPages()
     if beikaobiao_page_num < len(sheets.Worksheets):
         info.DisplayInfo("备考表页数[{}] 和 目录页数[{}] 不一致！".format(beikaobiao_page_num, len(sheets.Worksheets)))
+        sheets.Close(False)
+        beikaobiao_wb.Close(False)
+        beikaobiao_pdf_file.close()
+        os.remove(beikaobiao_pdf_path)
+        excel.Application.Quit()
         return 1
 
     pdf_list = os.listdir(pdf_dir)
@@ -49,10 +54,20 @@ def Split(excelFName, beikaobiao_fname, pdf_dir, output_dir, appName):
         pdf_fname = common.FindFNameByIdx(pdf_list, int(sheet_name))
         if not pdf_fname:
             info.DisplayInfo("没有找到第 " + sheet_name + " 页对应的pdf文件")
+            sheets.Close(False)
+            beikaobiao_wb.Close(False)
+            beikaobiao_pdf_file.close()
+            os.remove(beikaobiao_pdf_path)
+            excel.Application.Quit()
             return 1
         pdfPath = os.path.join(pdf_dir, pdf_fname)
         if (not os.path.exists(pdfPath)):
             info.DisplayInfo("pdf文件不存在！路径：" + pdfPath)
+            sheets.Close(False)
+            beikaobiao_wb.Close(False)
+            beikaobiao_pdf_file.close()
+            os.remove(beikaobiao_pdf_path)
+            excel.Application.Quit()
             return 1
         inputPDF = PdfFileReader(open(pdfPath, "rb"))
         catalog_pdf_path = output_dir + "/" + sheet_name + "kdjhdilrjhgdkrhn.pdf"

@@ -15,9 +15,9 @@ import traceback
 import info
 # import extractRule_1
 
-import openpyxl
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import shutil
+from win32com import client
 
 def Split(all_page_config, pdf_dir, output_dir):
     pdf_dir = common.Path(pdf_dir)
@@ -31,7 +31,9 @@ def Split(all_page_config, pdf_dir, output_dir):
     pdf_list = os.listdir(pdf_dir)
 
     for sheet_name, page_config in all_page_config.items():
-        info.DisplayInfo("\n\n开始处理页:" + sheet_name)
+        info.DisplayInfo("")
+        info.DisplayInfo("")
+        info.DisplayInfo("开始处理页:" + sheet_name)
         # print type(pdf_dir), type(sheet_name)
         pdf_fname = common.FindFNameByIdx(pdf_list, int(sheet_name))
         if not pdf_fname:
@@ -61,48 +63,49 @@ def Split(all_page_config, pdf_dir, output_dir):
             if new_write_fname != write_fname:
                 info.DisplayInfo("文件名有问题：" + write_fname)
             new_write_fname = os.path.join(sheet_dir, new_write_fname)
-            # write_fname = os.path.join(sheet_dir, page_config[i][0].encode("gbk") + ".pdf")
-            # print page_config[i][0].encode("gbk") + ".pdf"
-            # new_write_fname = common.CorrectFName(write_fname)
             start_page = page_config[i][1]
             end_page = page_config[i + 1][1]
             output = PdfFileWriter()
             for j in range(start_page, end_page):
                 output.addPage(inputPDF.getPage(j - 1))
+            new_write_fname = new_write_fname.replace("\n", "")
             info.DisplayInfo("开始写pdf文件 : " + new_write_fname)
             output.write(open(new_write_fname, "wb"))
     return 0
 
-def ReadSplitConfig(excelFName):
+def ReadSplitConfig(excelFName, appName):
     page_config = dict()
     excelFName = common.Path(excelFName)
     if not os.path.exists(excelFName):
         info.DisplayInfo("文件不存在！路径：" + excelFName)
         return 1
 
-    # excel = client.Dispatch(appName)
-    # # excel = client.Dispatch("Excel.Application")
-    # # excel = client.gencache.EnsureDispatch("et.Application")
-    # # print "excel : ", excel
-    # sheets = excel.Workbooks.Open(excelFName)
+    excel = client.Dispatch(appName)
+    excel_wb = excel.Workbooks.Open(excelFName)
 
-    excel_file = openpyxl.load_workbook(excelFName, True)
-    all_sheet_names = excel_file.get_sheet_names()
-    for sheet_name in all_sheet_names:
-        sheet = excel_file.get_sheet_by_name(sheet_name)
+    for sheet in excel_wb.Worksheets:
+        # sheet = excel_file.get_sheet_by_name(sheet_name)
+        sheet_name = sheet.name
         sheet_name = sheet_name.encode("gbk")
         page_config[sheet_name] = list()
         sheet_config = page_config[sheet_name]
         row = 3
         while True:
-            out_fname = str(sheet[row][0].value) + "." + str(sheet[row][3].value.encode("gbk"))
+            # print "=== " , sheet.Cells(row, 1).Text, sheet.Cells(row, 4).Text
+            out_fname = str(int(sheet.Cells(row, 1).Text)) + "." + str(sheet.Cells(row, 4).Text.encode("gbk"))
             if not out_fname:
                 info.DisplayInfo(sheet_name + " 页处理失败，没有填文件题名，行号：" + str(row))
+                excel_wb.Close()
+                excel.Application.Quit()
                 return 1
-            page = sheet[row][5].value
+            page = sheet.Cells(row, 6).Text
+            # print "ppp : ", page
             if not page:
                 info.DisplayInfo(sheet_name + " 页处理失败，页码填错，行号：" + str(row))
+                excel_wb.Close()
+                excel.Application.Quit()
                 return 1
+            # print "ppp : ", page
             # print "page:", page
             page = str(page)
             page = "".join(page.split())
@@ -111,6 +114,8 @@ def ReadSplitConfig(excelFName):
                 data = page.split("-")
                 if len(data) != 2 or not data[0].isdigit() or not data[1].isdigit():
                     info.DisplayInfo(sheet_name + " 页处理失败，页码填错，行号：" + str(row))
+                    excel_wb.Close()
+                    excel.Application.Quit()
                     return 1
                 sheet_config.append([out_fname, int(data[0])])
                 sheet_config.append(["", int(data[1]) + 1])
@@ -118,15 +123,21 @@ def ReadSplitConfig(excelFName):
             else:
                 if not page.isdigit():
                     info.DisplayInfo(sheet_name + " 页处理失败，页码填错，行号：" + str(row))
+                    excel_wb.Close()
+                    excel.Application.Quit()
                     return 1
                 sheet_config.append([out_fname, int(page)])
             row += 1
         for idx in range(0, len(sheet_config) - 1):
             if sheet_config[idx + 1][1] <= sheet_config[idx][1]:
                 info.DisplayInfo(sheet_name + " 页处理失败，页码填错，行号：" + str(idx + 1))
+                excel_wb.Close()
+                excel.Application.Quit()
                 return 1
         # dir(sheet)
         # print sheet_name, type(sheet_name), type(u"题名")
+    excel_wb.Close()
+    excel.Application.Quit()
     return page_config
 
 def AutoSplitMain():
@@ -153,8 +164,10 @@ def AutoSplitMain():
     info.DisplayInfo("pdf dir : " + pdfDir)
     outputDir = sys.argv[3]
     info.DisplayInfo("output dir : " + outputDir)
+    appName = sys.argv[4]
+    info.DisplayInfo("app name : " + appName)
 
-    page_config = ReadSplitConfig(excelFName)
+    page_config = ReadSplitConfig(excelFName, appName)
     if page_config != 1:
         if Split(page_config, pdfDir, outputDir) == 0:
             info.DisplayInfo("处理完成")

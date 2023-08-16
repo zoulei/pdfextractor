@@ -4,6 +4,7 @@ import os.path
 import os
 import traceback
 import sys
+import re
 
 def Path(fname):
     if fname.endswith("\""):
