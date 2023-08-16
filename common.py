@@ -81,6 +81,23 @@ def CorrectFName(fname):
         fname = fname.replace(v, "")
     return fname
 
+def FindFNameByIdx(fname_list, idx):
+    for fname in fname_list:
+        first_idx = fname.find("-")
+        if first_idx == -1:
+            continue
+        last_pos = len(fname)
+        for i in range(first_idx + 1, len(fname)):
+            if not fname[i].isdigit():
+                last_pos =  i
+                break
+        idx_str = fname[first_idx + 1: last_pos]
+        if not idx_str:
+            continue
+        if int(idx_str) == idx:
+            return fname
+    return ""
+
 if __name__ == "__main__":
     print GeneraterPageNumber("081-082")
     print GeneraterPageNumber("081-082A")

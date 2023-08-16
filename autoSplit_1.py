@@ -28,10 +28,17 @@ def Split(all_page_config, pdf_dir, output_dir):
     if not os.path.exists(output_dir):
         info.DisplayInfo("目录不存在！路径：" + output_dir)
         return 1
+    pdf_list = os.listdir(pdf_dir)
+
     for sheet_name, page_config in all_page_config.items():
-        info.DisplayInfo("开始处理页:" + sheet_name)
+        info.DisplayInfo("\n\n开始处理页:" + sheet_name)
         # print type(pdf_dir), type(sheet_name)
-        pdfPath = os.path.join(pdf_dir, sheet_name+".pdf")
+        pdf_fname = common.FindFNameByIdx(pdf_list, int(sheet_name))
+        if not pdf_fname:
+            info.DisplayInfo("没有找到第 " + sheet_name + " 页对应的pdf文件")
+            return 1
+        pdfPath = os.path.join(pdf_dir, pdf_fname)
+        # pdfPath = os.path.join(pdf_dir, sheet_name+".pdf")
         if (not os.path.exists(pdfPath)):
             info.DisplayInfo("pdf文件不存在！路径：" + pdfPath)
             return 1
@@ -62,6 +69,7 @@ def Split(all_page_config, pdf_dir, output_dir):
             output = PdfFileWriter()
             for j in range(start_page, end_page):
                 output.addPage(inputPDF.getPage(j - 1))
+            info.DisplayInfo("开始写pdf文件 : " + new_write_fname)
             output.write(open(new_write_fname, "wb"))
     return 0
 
@@ -71,6 +79,13 @@ def ReadSplitConfig(excelFName):
     if not os.path.exists(excelFName):
         info.DisplayInfo("文件不存在！路径：" + excelFName)
         return 1
+
+    # excel = client.Dispatch(appName)
+    # # excel = client.Dispatch("Excel.Application")
+    # # excel = client.gencache.EnsureDispatch("et.Application")
+    # # print "excel : ", excel
+    # sheets = excel.Workbooks.Open(excelFName)
+
     excel_file = openpyxl.load_workbook(excelFName, True)
     all_sheet_names = excel_file.get_sheet_names()
     for sheet_name in all_sheet_names:
@@ -106,6 +121,10 @@ def ReadSplitConfig(excelFName):
                     return 1
                 sheet_config.append([out_fname, int(page)])
             row += 1
+        for idx in range(0, len(sheet_config) - 1):
+            if sheet_config[idx + 1][1] <= sheet_config[idx][1]:
+                info.DisplayInfo(sheet_name + " 页处理失败，页码填错，行号：" + str(idx + 1))
+                return 1
         # dir(sheet)
         # print sheet_name, type(sheet_name), type(u"题名")
     return page_config

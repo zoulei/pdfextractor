@@ -16,7 +16,7 @@ import py2exe
 #       )
 
 # how to use :
-# under cmd : python setup.py py2exe
+# under cmd : c:\python27\python.exe setup.py py2exe
 # setup(console=["autoSplit.py","deleteABCD.py","mercolumn.py","gencover.py","checksplitresult.py","packfile.py","newgencover.py","autofillxlsfile.py","correctpdfdirection.py","mergepdf.py","blank_page_delete.py"])
 setup(console=["autoSplit_1.py", "add_catalog_beikaobiao.py"], options={
         "py2exe":{

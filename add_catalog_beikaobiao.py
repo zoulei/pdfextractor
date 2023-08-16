@@ -9,7 +9,7 @@ import sys
 import info
 
 import openpyxl
-from pyPdf import PdfFileWriter, PdfFileReader
+from PyPDF2 import PdfFileWriter, PdfFileReader
 from win32com import client
 
 def Split(excelFName, beikaobiao_fname, pdf_dir, output_dir, appName):
@@ -40,11 +40,17 @@ def Split(excelFName, beikaobiao_fname, pdf_dir, output_dir, appName):
         info.DisplayInfo("备考表页数[{}] 和 目录页数[{}] 不一致！".format(beikaobiao_page_num, len(sheets.Worksheets)))
         return 1
 
+    pdf_list = os.listdir(pdf_dir)
+
     for tmp_sheet in sheets.Worksheets:
         sheet_name = tmp_sheet.name
         sheet_name = sheet_name.encode("gbk")
         info.DisplayInfo("开始处理页:" + sheet_name)
-        pdfPath = os.path.join(pdf_dir, sheet_name + ".pdf")
+        pdf_fname = common.FindFNameByIdx(pdf_list, int(sheet_name))
+        if not pdf_fname:
+            info.DisplayInfo("没有找到第 " + sheet_name + " 页对应的pdf文件")
+            return 1
+        pdfPath = os.path.join(pdf_dir, pdf_fname)
         if (not os.path.exists(pdfPath)):
             info.DisplayInfo("pdf文件不存在！路径：" + pdfPath)
             return 1
