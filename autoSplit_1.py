@@ -84,9 +84,12 @@ def ReadSplitConfig(excelFName, appName):
     excel_wb = excel.Workbooks.Open(excelFName)
 
     for sheet in excel_wb.Worksheets:
+
         # sheet = excel_file.get_sheet_by_name(sheet_name)
         sheet_name = sheet.name
+
         sheet_name = sheet_name.encode("gbk")
+        info.DisplayInfo("开始读取页信息：" + sheet_name)
         page_config[sheet_name] = list()
         sheet_config = page_config[sheet_name]
         row = 3

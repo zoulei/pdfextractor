@@ -18,7 +18,7 @@ import py2exe
 # how to use :
 # under cmd : c:\python27\python.exe setup.py py2exe
 # setup(console=["autoSplit.py","deleteABCD.py","mercolumn.py","gencover.py","checksplitresult.py","packfile.py","newgencover.py","autofillxlsfile.py","correctpdfdirection.py","mergepdf.py","blank_page_delete.py"])
-setup(console=["autoSplit_1.py", "add_catalog_beikaobiao.py"], options={
+setup(console=["autoSplit_1.py", "add_catalog_beikaobiao.py", "add_catalog.py"], options={
         "py2exe":{
              "dll_excludes":["libopenblas.TXA6YQSD3GCQQC22GEQ54J2UDCXDXHWN.gfortran-win_amd64.dll",
                              "libdet.KNZJ5W323CIP452TKKVK72OCSS32QOKE.gfortran-win_amd64.dll",
